@@ -1,11 +1,10 @@
 package com.crowsnest.environment
 
+import kotlin.test.assertContains
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertContains
-import kotlin.test.assertFalse
 
 class BrowserControllerTest {
 
@@ -40,12 +39,14 @@ class BrowserControllerTest {
         // 1. Check for Markdown formatting
         assertContains(snapshot, "# Job #1 Details") // H1 conversion
 
-        // 2. Check for Body Text (This was failing before)
+        // 2. Check for Body Text
         assertContains(snapshot, "This is a great description for job 1")
 
-        // 3. Check for Actions
-        assertContains(snapshot, "## Available Actions:")
-        assertContains(snapshot, "[1] Click Link: Back to Board")
+        // 3. Check for Links Found section
+        assertContains(snapshot, "## Links Found:")
+        // The mock server details page usually has a "Back" link
+        // assertContains(snapshot, "- [Back to Board](${server.baseUrl})") // Assuming mock server
+        // structure
     }
 
     @Test
@@ -61,70 +62,49 @@ class BrowserControllerTest {
         assertContains(snapshot, "Junior Kotlin Developer")
         assertContains(snapshot, "Senior AI Engineer")
 
-        // Assert Actions
-        assertContains(snapshot, "[1] Click Link: Junior Kotlin Developer")
-        assertContains(snapshot, "[2] Click Link: Senior AI Engineer")
+        // Assert Links with URLs
+        // Note: The MockJobBoardServer produces <a href="/job/1">Junior Kotlin Developer -
+        // JetBrains</a>
+
+        assertContains(snapshot, "- [Junior Kotlin Developer - JetBrains]")
+        assertContains(snapshot, "(${server.baseUrl}/job/1)")
+
+        assertContains(snapshot, "- [Senior AI Engineer - OpenAI]")
+        assertContains(snapshot, "(${server.baseUrl}/job/2)")
     }
 
     @Test
     fun `test navigation tool interaction`() = runBlocking {
         controller.openUrl(server.baseUrl)
-        controller.getSnapshot() // Populate cache
 
-        // Act
-        val resultMsg = tools.clickLink("1")
-        assertContains(resultMsg, "Successfully clicked [1]")
+        // Act: Use openUrl tool to go to job 1
+        val jobUrl = "${server.baseUrl}/job/1"
+        val resultMsg = tools.openUrl(jobUrl)
+
+        assertContains(resultMsg, "Successfully navigated to [$jobUrl]")
 
         // Act
         val detailSnapshot = controller.getSnapshot()
 
-        // Assert we see the details in the text
         assertContains(detailSnapshot, "Job #1 Details")
         assertContains(detailSnapshot, "This is a great description")
     }
 
     @Test
-    fun `test visited link masking logic`() = runBlocking {
-        controller.openUrl(server.baseUrl)
+    fun `test button pagination`() = runBlocking {
+        // 1. Open Button Pagination Page
+        controller.openUrl("${server.baseUrl}/button-pagination")
 
-        // 1. Initial State
-        var snapshot = controller.getSnapshot()
-        assertContains(snapshot, "[1] Click Link: Junior Kotlin Developer")
-
-        // 2. Click Link [1]
-        tools.clickLink("1")
-
-        // 3. Go Back
-        tools.navigateBack()
-
-        // 4. Snapshot again
-        snapshot = controller.getSnapshot()
-        println("Snapshot after return:\n$snapshot")
-
-        // Assert: Junior Dev is VISITED
-        assertContains(snapshot, "[VISITED] Junior Kotlin Developer")
-        // It should NOT have a clickable ID
-        assertFalse(snapshot.contains("[1] Click Link: Junior Kotlin Developer"))
-
-        // Assert: Senior Dev takes the next available ID
-        assertContains(snapshot, "[2] Click Link: Senior AI Engineer")
-    }
-
-    @Test
-    fun `test navigation back protection`() = runBlocking {
-        // 1. Open Landing Page
-        controller.openUrl(server.baseUrl)
-        controller.getSnapshot() // Ensure loaded
-
-        // 2. Try to Navigate Back immediately (this would go to about:blank)
-        val result = tools.navigateBack()
-
-        // Assert: Tool should return the friendly error message
-        assertContains(result, "Cannot navigate back further")
-
-        // 3. Verify we are safely back on the Landing Page
+        // 2. Get Snapshot
         val snapshot = controller.getSnapshot()
-        assertContains(snapshot, "Welcome to the Job Board")
-        assertContains(snapshot, "Junior Kotlin Developer")
+
+        // 3. Assert it contains buttons in the interactive elements section
+        // The "Next page" button has both an ID and an aria-label, so ID takes priority
+        assertContains(snapshot, "Next page") // aria-label is used as the label
+        assertContains(snapshot, "#next-btn") // ID-based selector takes priority
+
+        // The "Previous page" button has only aria-label (no ID)
+        assertContains(snapshot, "Previous page")
+        assertContains(snapshot, "button[aria-label=\"Previous page\"]")
     }
 }

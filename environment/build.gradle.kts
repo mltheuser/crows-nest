@@ -17,3 +17,10 @@ dependencies {
 
     testImplementation(kotlin("test"))
 }
+
+tasks.withType<Test> {
+    testLogging {
+        showStandardStreams = true
+        events("passed", "skipped", "failed")
+    }
+}
