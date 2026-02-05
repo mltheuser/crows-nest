@@ -8,5 +8,8 @@ dependencyResolutionManagement {
 
 include(":agent")
 include(":environment")
+include(":database")
+include(":matcher")
+include(":web")
 
 rootProject.name = "CrowsNest"

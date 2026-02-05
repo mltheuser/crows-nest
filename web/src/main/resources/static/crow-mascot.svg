@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#333;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="beakGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Crow's Nest (Basket) -->
+  <path d="M60 160 L140 160 L130 190 L70 190 Z" fill="#5D4037" stroke="#3E2723" stroke-width="2"/>
+  <rect x="95" y="190" width="10" height="10" fill="#5D4037"/>
+
+  <!-- Chubby Body -->
+  <ellipse cx="100" cy="130" rx="45" ry="40" fill="url(#bodyGrad)"/>
+  
+  <!-- Wings (tucked in) -->
+  <path d="M55 130 Q45 140 60 150" fill="#222" />
+  <path d="M145 130 Q155 140 140 150" fill="#222" />
+
+  <!-- Eyes (big and cute) -->
+  <circle cx="85" cy="115" r="8" fill="white"/>
+  <circle cx="85" cy="115" r="3" fill="black"/>
+  <circle cx="115" cy="115" r="8" fill="white"/>
+  <circle cx="115" cy="115" r="3" fill="black"/>
+
+  <!-- Beak (small & cute) -->
+  <path d="M92 125 L108 125 L100 138 Z" fill="url(#beakGrad)"/>
+
+  <!-- Spyglass (Checking out the view, mounted on rim) -->
+  <rect x="120" y="155" width="40" height="8" fill="#f59e0b" transform="rotate(-15 120 155)"/>
+  <rect x="155" y="145" width="8" height="12" fill="#d97706" transform="rotate(-15 155 145)"/>
+  
+  <!-- Feet -->
+  <path d="M90 170 L90 160" stroke="#f59e0b" stroke-width="3"/>
+  <path d="M110 170 L110 160" stroke="#f59e0b" stroke-width="3"/>
+</svg>

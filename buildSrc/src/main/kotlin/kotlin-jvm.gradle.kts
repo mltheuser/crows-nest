@@ -3,6 +3,8 @@
 package buildsrc.convention
 
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import java.io.File
+import java.util.Properties
 
 plugins {
     // Apply the Kotlin JVM plugin to add support for Kotlin in JVM projects.
@@ -14,7 +16,34 @@ kotlin {
     jvmToolchain(21)
 }
 
+// Load environment variables from .env file
+fun loadEnvFile(): Map<String, String> {
+    val envFile = rootProject.file(".env")
+    if (!envFile.exists()) return emptyMap()
+    
+    return envFile.readLines()
+        .filter { it.isNotBlank() && !it.startsWith("#") && it.contains("=") }
+        .associate { line ->
+            val (key, value) = line.split("=", limit = 2)
+            key.trim() to value.trim()
+        }
+}
+
+// Apply env vars to all JavaExec tasks (including run)
+tasks.withType<JavaExec>().configureEach {
+    val envVars = loadEnvFile()
+    envVars.forEach { (key, value) ->
+        environment(key, value)
+    }
+}
+
 tasks.withType<Test>().configureEach {
+    // Load env vars for tests too
+    val envVars = loadEnvFile()
+    envVars.forEach { (key, value) ->
+        environment(key, value)
+    }
+    
     // Configure all test Gradle tasks to use JUnitPlatform.
     useJUnitPlatform()
 

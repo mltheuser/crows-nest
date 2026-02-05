@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Job Listings</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<h1>Job Listings (Button Pagination)</h1>
+<div id="loading">Loading jobs...</div>
+<div id="job-list" class="job-list"></div>
+
+<nav class="pagination">
+    <button aria-label="Previous page" class="pagination__prev" style="display:none;">Previous</button>
+    <button id="next-btn" aria-label="Next page" class="pagination__next" style="display:none;">Next</button>
+</nav>
+
+<script src="/static/listing-script.js"></script>
+</body>
+</html>
